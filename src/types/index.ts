@@ -51,6 +51,7 @@ export interface IItemData {
   items: IItem[];
   updateState(itemId: string): void;
   getItem(itemId: string): IItem;
+  hasPrice(price: string): void;
 }
 
 export interface IBasketData {
@@ -58,37 +59,50 @@ export interface IBasketData {
   totalizeBasket(items: TItemInfo[]): number;
   numerateBasket(items: TItemInfo[]): string;
   deleteItem(itemId: string): void;
+  addItem(itemId: string): TItemInfo;
+  hasItems(): void;
+}
+
+export interface IForm {
+  userData: TUserData;
+  showErrors(errors: string): void;
+  checkValid(data: string): void;
 }
 
 export interface IModal {
   modal: HTMLElement;
   close: () => void;
   open: () => void;
+  render<T>(content: T): HTMLElement;
 }
 
-export interface IBasketModal extends IModal {
+export interface IItemPreview {
+  image: HTMLImageElement;
+  category: HTMLSpanElement;
+  title: HTMLHeadingElement;
+  description: HTMLParagraphElement;
+  addButton: HTMLButtonElement;
+  price: HTMLSpanElement;
+}
+
+export interface IBasketView {
   submitButton: HTMLButtonElement;
   handleSumbit: Function;
-  hasItems(): void;
 }
 
-export interface IItemModal extends IModal {
-  addButton: HTMLButtonElement;
-}
-
-export interface IPaymentModal extends IModal {
+export interface IPaymentView {
   form: HTMLFormElement;
   submitButton: HTMLButtonElement;
   handleSubmit: Function;
 }
 
-export interface IContactsModal extends IModal {
+export interface IContactsView {
   form: HTMLFormElement;
   submitButton: HTMLButtonElement;
   handleSubmit: Function;
 }
 
-export interface ISuccessModal extends IModal {
+export interface ISuccessView {
   closeButton: HTMLButtonElement;
 }
 
