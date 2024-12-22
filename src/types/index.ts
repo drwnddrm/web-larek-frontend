@@ -3,7 +3,6 @@ export enum Events {
   BUY = 'item:buy',
   SELECT = 'item:select',
   DELETE = 'item:delete',
-  DELETE_IN_PREVIEW = 'itemPreview:delete',
   ITEM_OPEN = 'item:open',
   BASKET_OPEN = 'basket:open',
   BASKET_CHANGE = 'basket:change',
@@ -36,6 +35,25 @@ export type TContacts = {
   phone: string
 }
 
+export type TPayment = 'card' | 'cash'
+
+export interface IUserData {
+  payment: TPayment,
+  address: string,
+  email: string,
+  phone: string
+}
+
+export interface IOrder extends IUserData {
+  items: string[],
+  total: number
+}
+
+export interface IOrderApi {
+  id: string,
+  total: number
+}
+
 export interface IItemsApi {
   total: number
   items: IItem[]
@@ -57,12 +75,5 @@ export interface IBasketData {
 export interface IApi {
   baseUrl: string
   get<T>(url: string): Promise<T>
-}
-
-export interface IForm {
-  card: boolean,
-  cash: boolean,
-  address: string,
-  email: string,
-  phone: string
+  post<T>(url: string, order: object): Promise<T>
 }

@@ -54,6 +54,8 @@ export class Payment extends Form {
   }
 
   clearForm(): void {
+    this.cardRadio.classList.remove('button_alt-active')
+    this.cashRadio.classList.add('button_alt-active')
     this.addressInput.value = ''
     this.errorForm.textContent = ''
     this.submit = true

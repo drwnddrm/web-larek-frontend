@@ -133,7 +133,7 @@ export class Item extends Component<IItem> {
     if(check) {
       this.button.textContent = 'Убрать'
       this.button.addEventListener('click', () => {
-        this.events.emit(Events.DELETE_IN_PREVIEW, { item: this })
+        this.events.emit(Events.DELETE, { item: this })
       })
     } else {
       this.button.textContent = 'Купить'

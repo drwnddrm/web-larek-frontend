@@ -67,6 +67,23 @@ type TContacts = {
 }
 ```
 
+Тип выбора способа оплаты
+
+```
+type TPayment = 'card' | 'cash'
+```
+
+Пользовательские данные
+
+```
+interface IUserData {
+  payment: TPayment,
+  address: string,
+  email: string,
+  phone: string
+}
+```
+
 ## Архитектура приложения
 
 Код приложения разделен на слои согласно MVP:
@@ -131,7 +148,6 @@ type TContacts = {
 - `deleteItem(itemId: string): void` — метод, позволяющий удалить товар из корзины;
 - `addItem(item: Partial<IItem>): void` — метод, позволяющий добавить товар в корзину;
 - `isInBasket(itemId: string): boolean` — метод, который проверяет есть ли товар в корзине;
-- `deleteAllItems(): void` — метод для очищения всей корзины.
 
 Также в классе реализованы геттеры для получения данных из полей класса, таких как `items`, `count`, `summary`.
 
@@ -141,8 +157,7 @@ type TContacts = {
 Конструктор класса принимает инстант брокера событий.\
 
 Поля класса:
-- `_card: boolean` — хранит значение выбора способа оплаты;
-- `_cash: boolean` — хранит значение выбора способа оплаты;
+- `_payment: TPayment` — хранит значение выбора способа оплаты;
 - `_address: string` — адрес доставки;
 - `_email: string` — электронная почта;
 - `_phone: string` — номер телефона;
@@ -155,7 +170,7 @@ type TContacts = {
 - `checkPhoneValidation(): string | undefined` — метод, проверящий поле инпута номера телефона на ошибки и возвращает либо ошибку либо `undefined`;
 - `clearForm(): void` — очищает все сохраненные данные в полях.
 
-Также в классе есть сеттеры для полей класса `card`, `cash`, `address`, `email` и `phone`.
+Также в классе есть сеттеры и геттеры для полей класса `payment`, `address`, `email` и `phone`.
 
 ### Компоненты представления
 
@@ -308,7 +323,6 @@ enum Events {
   BUY = 'item:buy', //Событие добавления предмета в корзину
   SELECT = 'item:select', //Событие выбора предмета для отображения в модальном окне превью
   DELETE = 'item:delete', //Событие удаления предмета из корзины
-  DELETE_IN_PREVIEW = 'itemPreview:delete', //Событие удаления предмета из корзины, находясь в модальном окне превью
   ITEM_OPEN = 'item:open', //Событие открытия модального окна превью
   BASKET_OPEN = 'basket:open', //Событие открытия модального окна корзины
   BASKET_CHANGE = 'basket:change', //Событие изменения данных в корзине

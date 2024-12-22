@@ -34,11 +34,11 @@ export class Api implements IApi{
         }).then(this.handleResponse<T>);
     }
 
-    post(uri: string, data: object, method: ApiPostMethods = 'POST') {
+    post<T>(uri: string, data: object, method: ApiPostMethods = 'POST') {
         return fetch(this.baseUrl + uri, {
             ...this.options,
             method,
             body: JSON.stringify(data)
-        }).then(this.handleResponse);
+        }).then(this.handleResponse<T>);
     }
 }

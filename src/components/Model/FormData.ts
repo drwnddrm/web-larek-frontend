@@ -1,30 +1,41 @@
-import { Events, IForm, TContacts } from "../../types";
+import { Events, IUserData, TContacts, TPayment } from "../../types";
 import { ERRORS, REGEX } from "../../utils/constants";
 import { IEvents } from "../base/events";
 
-export class FormData implements IForm {
-  protected _card: boolean
-  protected _cash: boolean
+export class FormData implements IUserData {
+  protected _payment: TPayment
   protected _address: string
   protected _email: string
   protected _phone: string
 
   constructor(protected events: IEvents) {}
 
-  set card(value: boolean) {
-    this._card = value
+  get payment() {
+    return this._payment
   }
 
-  set cash(value: boolean) {
-    this._cash = value
+  set payment(value: TPayment) {
+    this._payment = value
+  }
+
+  get address() {
+    return this._address
   }
 
   set address(value: string) {
     this._address = value
   }
+
+  get email() {
+    return this._email
+  }
   
   set email(value: string) {
     this._email = value
+  }
+
+  get phone() {
+    return this._phone
   }
   
   set phone(value: string) {
@@ -34,21 +45,21 @@ export class FormData implements IForm {
   updateFields(field: keyof TContacts, value: string): void {
     this[field] = value
 
-    let valid: string | undefined
+    let valid: string
 
     switch (field) {
       case 'address':
-        valid = !this.checkPaymentValidation() ? undefined : ERRORS.address
+        valid = !this.checkPaymentValidation() ? '' : ERRORS.address
         break
       case 'email':
-        valid = !this.checkEmailValidation() ? undefined : ERRORS.email
+        valid = !this.checkEmailValidation() ? '' : ERRORS.email
         break
       case 'phone':
-        valid = !this.checkPhoneValidation() ? undefined : ERRORS.phone
+        valid = !this.checkPhoneValidation() ? '' : ERRORS.phone
         break
     }
     
-    if(valid === undefined) {
+    if(valid.length === 0) {
       this.events.emit(Events.VALID, {
         name: field
       })
@@ -60,33 +71,32 @@ export class FormData implements IForm {
     }
   }
 
-  checkPaymentValidation(): string | undefined {
+  checkPaymentValidation(): string {
     if(!REGEX.address.test(this._address)) {
       return ERRORS.address
     }
 
-    return undefined
+    return ''
   }
 
-  checkEmailValidation(): string | undefined {
+  checkEmailValidation(): string {
     if(!REGEX.email.test(this._email)) {
       return ERRORS.email
     }
     
-    return undefined
+    return ''
   }
 
-  checkPhoneValidation(): string | undefined {
+  checkPhoneValidation(): string {
     if(!REGEX.phone.test(this._phone)) {
       return ERRORS.phone
     }
 
-    return undefined
+    return ''
   }
 
   clearForm(): void {
-    this._card = false
-    this._cash = true
+    this._payment = 'cash'
     this._address = ''
     this._email = ''
     this._phone = ''

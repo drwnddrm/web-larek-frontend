@@ -50,10 +50,6 @@ export class BasketData implements IBasketData {
     return false
   }
 
-  deleteAllItems(): void {
-    this._items = []
-  }
-
   protected hasItems(): boolean {
     return !!this._items.length
   }

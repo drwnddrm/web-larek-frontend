@@ -12,7 +12,7 @@ import { Item } from './components/View/Item';
 import { Payment } from './components/View/Payment';
 import { Success } from './components/View/Success';
 import './scss/styles.scss';
-import { Events, IApi } from './types';
+import { Events, IApi, TPayment } from './types';
 import { API_URL, settings } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
@@ -97,44 +97,15 @@ events.on(Events.BUY, (data: { item: Item }) => {
 
 //Событие открытия корзины
 events.on(Events.BASKET_OPEN, () => {
-	basket.lock(basketData.items.length);
-	basket.items = basketData.items.map((item, i) => {
-		const itemBasket = new Item(
-      cloneTemplate(itemBasketTemplate), 
-      events
-    )
-
-		return itemBasket.render({
-			id: item.id,
-			title: item.title,
-			price: item.price,
-			index: i + 1,
-		})
-	})
-
-	modal.render({
+  modal.render({
 		content: basket.render({
 			summary: basketData.summary,
 		}),
 	})
 })
 
-//Событие удаления предмета из корзины внутри превью
-events.on(Events.DELETE_IN_PREVIEW, (data: { item: Item }) => {
-	basketData.deleteItem(data.item.id)
-	basketData.updateState()
-	page.counter = basketData.count
-	modal.close()
-})
-
-//События удаления предмета из корзины внутри корзины
-events.on(Events.DELETE, (data: { item: Item }) => {
-	basketData.deleteItem(data.item.id)
-	basketData.updateState()
-
-	page.counter = basketData.count
-
-	basket.lock(basketData.items.length)
+events.on(Events.BASKET_CHANGE, () => {
+  basket.lock(basketData.items.length)
 
 	basket.items = basketData.items.map((item, i) => {
 		const itemBasket = new Item(
@@ -150,9 +121,22 @@ events.on(Events.DELETE, (data: { item: Item }) => {
 		})
 	})
 
+  basketData.updateState()
 	basket.render({
 		summary: basketData.summary,
 	})
+})
+
+//События удаления предмета из корзины внутри корзины
+events.on(Events.DELETE, (data: { item: Item }) => {
+	basketData.deleteItem(data.item.id)
+	basketData.updateState()
+
+	page.counter = basketData.count
+
+  if(data.item.description) {
+    modal.close()
+  }
 })
 
 //Событие рендера модального окна выбора способов оплаты и адреса доставки
@@ -163,7 +147,10 @@ events.on(Events.PAY, () => {
 })
 
 //Событие изменение способа оплаты
-events.on(Events.PAYMENT, ( data: {payment: string} ) => {
+events.on(Events.PAYMENT, ( data: {payment: TPayment} ) => {
+  console.log(data.payment)
+  formData.payment = data.payment
+
   payment.toggleButtons(data.payment)
 })
 
@@ -197,19 +184,36 @@ events.on(Events.CONTACTS, (data: {name: string, value: string}) => {
 
 //Событие рендера модального окна успешной покупки
 events.on(Events.CONFIRM, () => {
-  modal.render({
-    content: success.render({
-      total: basket.sum
+  api.postOrder( {
+    payment: formData.payment ? formData.payment : 'cash',
+    address: formData.address,
+    email: formData.email,
+    phone: formData.phone,
+    items: basketData.items.map(item => item.id),
+    total: basketData.summary
+  })
+  .then(res => {
+    basketData.items.forEach((item) => {
+      basketData.deleteItem(item.id)
+    })
+    basketData.updateState()
+    formData.clearForm()
+    payment.clearForm()
+    contacts.clearForm()
+  
+    page.counter = basketData.count
+    
+    modal.render({
+      content: success.render({
+        total: basket.sum
+      })
     })
   })
+  
 })
 
 //Событие нажатия кнопки успешной покупки
 events.on(Events.SUCCESS, () => {
-  basketData.deleteAllItems()
-  basketData.updateState()
-
-  page.counter = basketData.count
   modal.close()
 })
 
@@ -250,9 +254,6 @@ events.on(Events.OPEN, () => {
 
 //Событие открытия любых модальных окон и снятие запрета прокрутки страницы
 events.on(Events.CLOSE, () => {
-  payment.clearForm()
-  contacts.clearForm()
-  formData.clearForm()
   page.locked = false
 })
 
