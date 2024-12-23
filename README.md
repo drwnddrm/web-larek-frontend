@@ -148,6 +148,7 @@ interface IUserData {
 - `deleteItem(itemId: string): void` — метод, позволяющий удалить товар из корзины;
 - `addItem(item: Partial<IItem>): void` — метод, позволяющий добавить товар в корзину;
 - `isInBasket(itemId: string): boolean` — метод, который проверяет есть ли товар в корзине;
+- `deleteAll(): void` — метод, очищающий всю корзину
 
 Также в классе реализованы геттеры для получения данных из полей класса, таких как `items`, `count`, `summary`.
 
