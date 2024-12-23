@@ -28,45 +28,29 @@ export class BasketData implements IBasketData {
   }
 
   deleteItem(itemId: string): void {
-    if(this.hasItems()) {
-      this._items = this._items.filter(item => item.id !== itemId)
-      this.events.emit(Events.BASKET_CHANGE)
-    }
+    this._items = this._items.filter(item => item.id !== itemId)
+    this.events.emit(Events.BASKET_CHANGE)
   }
   
   addItem(item: Partial<IItem>): void {
-    if(this.hasItems()) {
-      this._items = [item, ...this._items]
-    } else {
-      this._items = [item]
-    }
+    this._items = [item, ...this._items]
     this.events.emit(Events.BASKET_CHANGE)
   }
 
   isInBasket(itemId: string): boolean {
-    if(this.hasItems()){
-      return this._items.some(item => item.id === itemId)
-    }
-    return false
+    return this._items.some(item => item.id === itemId)
   }
 
-  protected hasItems(): boolean {
-    return !!this._items.length
+  deleteAll(): void {
+    this._items = []
+    this.events.emit(Events.BASKET_CHANGE)
   }
 
   protected numerateBasket(): void {
-    if(this.hasItems()) {
-      this._count = this._items.length
-    } else {
-      this._count = 0
-    }
+    this._count = this._items.length
   }
 
   protected totalizeBasket(): void {
-    if(this.hasItems()) {
-      this._summary = this._items.reduce((acc, curr) => acc + curr.price, 0)
-    } else {
-      this._summary = 0;
-    }
+    this._summary = this._items.reduce((acc, curr) => acc + curr.price, 0)
   }
 }

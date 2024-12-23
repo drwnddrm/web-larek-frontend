@@ -89,7 +89,6 @@ events.on(Events.SELECT, (data: { item: Item }) => {
 //Событие покупки, добавление в корзину предмета
 events.on(Events.BUY, (data: { item: Item }) => {
 	basketData.addItem(data.item)
-	basketData.updateState()
 
 	page.counter = basketData.count
 	modal.close()
@@ -105,6 +104,7 @@ events.on(Events.BASKET_OPEN, () => {
 })
 
 events.on(Events.BASKET_CHANGE, () => {
+  basketData.updateState()
   basket.lock(basketData.items.length)
 
 	basket.items = basketData.items.map((item, i) => {
@@ -121,7 +121,6 @@ events.on(Events.BASKET_CHANGE, () => {
 		})
 	})
 
-  basketData.updateState()
 	basket.render({
 		summary: basketData.summary,
 	})
@@ -130,7 +129,6 @@ events.on(Events.BASKET_CHANGE, () => {
 //События удаления предмета из корзины внутри корзины
 events.on(Events.DELETE, (data: { item: Item }) => {
 	basketData.deleteItem(data.item.id)
-	basketData.updateState()
 
 	page.counter = basketData.count
 
@@ -193,10 +191,7 @@ events.on(Events.CONFIRM, () => {
     total: basketData.summary
   })
   .then(res => {
-    basketData.items.forEach((item) => {
-      basketData.deleteItem(item.id)
-    })
-    basketData.updateState()
+    basketData.deleteAll()
     formData.clearForm()
     payment.clearForm()
     contacts.clearForm()
@@ -208,6 +203,9 @@ events.on(Events.CONFIRM, () => {
         total: basket.sum
       })
     })
+  })
+  .catch(err => {
+    console.error(err)
   })
   
 })
